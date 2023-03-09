@@ -1,2 +1,1 @@
-# [OpenChat-Backend](https://github.com/AyanavaKarmakar/OpenChat-Backend)-Tests
-Tests for OpenChat Backend, using ASP.NET Core &amp; Xunit (WIP)
+![OpenChat-Backend-Tests](https://socialify.git.ci/AyanavaKarmakar/OpenChat-Backend-Tests/image?description=1&font=Raleway&language=1&name=1&pattern=Solid&theme=Dark)
