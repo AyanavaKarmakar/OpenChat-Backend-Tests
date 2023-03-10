@@ -11,42 +11,46 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
                             .UseInMemoryDatabase(databaseName: "TestDB")
                             .Options;
 
+        private async Task<ChatDB> ArrangeTestData()
+        {
+            var context = new ChatDB(options);
+
+            var messages = new List<Message>
+            {
+                new Message
+                {
+                    Id = 1,
+                    Sender = "user1",
+                    MessageContent = "Hello",
+                    Timestamp = DateTime.Now
+                },
+                new Message
+                {
+                    Id = 2,
+                    Sender = "user2",
+                    MessageContent = "Hi",
+                    Timestamp = DateTime.Now.AddSeconds(5)
+                },
+                new Message
+                {
+                    Id = 3,
+                    Sender = "user1",
+                    MessageContent = "How are you?",
+                    Timestamp = DateTime.Now.AddSeconds(10)
+                }
+            };
+
+            context.Messages.AddRange(messages);
+            await context.SaveChangesAsync();
+
+            return context;
+        }
+
         [Fact]
         public async Task GetAllMessages_ReturnsOkObjectResult_WithListOfMessages()
         {
             // Arrange
-            using (var context = new ChatDB(options))
-            {
-                var messages = new List<Message>
-                {
-                    new Message
-                    {
-                        Id = 1,
-                        Sender = "user1",
-                        MessageContent = "Hello",
-                        Timestamp = DateTime.Now
-                    },
-                    new Message
-                    {
-                        Id = 2,
-                        Sender = "user2",
-                        MessageContent = "Hi",
-                        Timestamp = DateTime.Now.AddSeconds(5)
-                    },
-                    new Message
-                    {
-                        Id = 3,
-                        Sender = "user1",
-                        MessageContent = "How are you?",
-                        Timestamp = DateTime.Now.AddSeconds(10)
-                    }
-                };
-
-                context.Messages.AddRange(messages);
-                await context.SaveChangesAsync();
-            }
-
-            using (var context = new ChatDB(options))
+            using (var context = await ArrangeTestData())
             {
                 var controller = new MessageController(context);
 
