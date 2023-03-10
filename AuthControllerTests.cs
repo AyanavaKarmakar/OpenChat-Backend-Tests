@@ -1,8 +1,9 @@
 using Chat.Models;
 using Chat.UserDto;
+using Microsoft.AspNetCore.Mvc;
+using OpenChat.Auth.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using OpenChat.Auth.Controllers;
 
 namespace OpenChat.Auth.Tests
 {
@@ -60,7 +61,7 @@ namespace OpenChat.Auth.Tests
         }
 
         [Fact]
-        public async Task Register_ReturnsBadRequest_WhenUsernameIsAlreadyTaken()
+        public async Task Register_ReturnsBadRequestObjectResult_WhenUsernameIsAlreadyTaken()
         {
             using (var context = await ArrangeTestData())
             {
@@ -77,6 +78,13 @@ namespace OpenChat.Auth.Tests
 
                 // Assert
                 Assert.NotNull(result);
+
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+                Assert.Equal(400, badRequestResult.StatusCode);
+
+                var message = Assert.IsType<string>(
+                    badRequestResult.Value?.GetType().GetProperty("message")?.GetValue(badRequestResult.Value));
+                Assert.Equal("Username already taken", message);
             }
         }
 
