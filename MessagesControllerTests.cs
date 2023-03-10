@@ -220,5 +220,77 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
                 Assert.Equal("message not found", message);
             }
         }
+
+        [Fact]
+        public async Task UpdateMessage_WithValidId_AndMessageContent_ReturnsOkObjectResult_WithMessage()
+        {
+            using (var context = await ArrangeTestData())
+            {
+                // Arrange
+                var controller = new MessageController(context);
+                var messageId = 1;
+
+                // Act
+                var result = await controller.UpdateMessage(messageId, "Hello, World!");
+
+                // Assert
+                Assert.NotNull(result);
+
+                var okResult = Assert.IsType<OkObjectResult>(result);
+                Assert.Equal(200, okResult.StatusCode);
+
+                var message = Assert.IsType<Message>(okResult.Value);
+                Assert.Equal("Hello, World!", message.MessageContent);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateMessage_WithValidId_AndNullMessageContent_ReturnsBadRequestObjectResult_WithMessage()
+        {
+            using (var context = await ArrangeTestData())
+            {
+                // Arrange
+                var controller = new MessageController(context);
+                var messageId = 1;
+                var messageContent = null as string;
+
+                // Act
+                var result = await controller.UpdateMessage(messageId, messageContent);
+
+                // Assert
+                Assert.NotNull(result);
+
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+                Assert.Equal(400, badRequestResult.StatusCode);
+
+                var message = Assert.IsType<string>(
+                    badRequestResult.Value?.GetType().GetProperty("message")?.GetValue(badRequestResult.Value));
+                Assert.Equal("Message object is null", message);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateMessage_WithInvalidId_AndMessageContent_ReturnsNotFoundObjectResult_WithMessage()
+        {
+            using (var context = await ArrangeTestData())
+            {
+                // Arrange 
+                var controller = new MessageController(context);
+                var messageId = 100;
+
+                // Act
+                var result = await controller.UpdateMessage(messageId, "Hello, World!");
+
+                // Assert
+                Assert.NotNull(result);
+
+                var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+                Assert.Equal(404, notFoundResult.StatusCode);
+
+                var message = Assert.IsType<string>(
+                    notFoundResult.Value?.GetType().GetProperty("message")?.GetValue(notFoundResult.Value));
+                Assert.Equal("Message not found", message);
+            }
+        }
     }
 }
