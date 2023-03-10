@@ -172,5 +172,53 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
                 Assert.Equal("Message object is null", message);
             }
         }
+
+        [Fact]
+        public async Task DeleteMessage_WithValidId_ReturnsOkObjectResult_WithMessage()
+        {
+            using (var context = await ArrangeTestData())
+            {
+                // Arrange
+                var controller = new MessageController(context);
+                var messageId = 1;
+
+                // Act
+                var result = await controller.DeleteMessage(messageId);
+
+                // Assert
+                Assert.NotNull(result);
+
+                var okResult = Assert.IsType<OkObjectResult>(result);
+                Assert.Equal(200, okResult.StatusCode);
+
+                var message = Assert.IsType<string>(
+                    okResult.Value?.GetType().GetProperty("message")?.GetValue(okResult.Value));
+                Assert.Equal("Message deleted successfully", message);
+            }
+        }
+
+        [Fact]
+        public async Task DeleteMessage_WithInvalidId_ReturnsNotFoundObjectResult_WithMessage()
+        {
+            using (var context = await ArrangeTestData())
+            {
+                // Arrange
+                var controller = new MessageController(context);
+                var messageId = 100;
+
+                // Act
+                var result = await controller.DeleteMessage(messageId);
+
+                // Assert
+                Assert.NotNull(result);
+
+                var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+                Assert.Equal(404, notFoundResult.StatusCode);
+
+                var message = Assert.IsType<string>(
+                    notFoundResult.Value?.GetType().GetProperty("message")?.GetValue(notFoundResult.Value));
+                Assert.Equal("message not found", message);
+            }
+        }
     }
 }
