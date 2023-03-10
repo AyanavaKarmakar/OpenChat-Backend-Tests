@@ -119,5 +119,58 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
                 Assert.Equal("Message not found", message);
             }
         }
+
+        [Fact]
+        public async Task CreateMessage_WithValidMessage_ReturnsOkObjectResult_WithMessage()
+        {
+            // Arrange
+            using (var context = await ArrangeTestData())
+            {
+                var controller = new MessageController(context);
+                var message = new Message
+                {
+                    Id = 4,
+                    Sender = "user3",
+                    MessageContent = "Hello, World!",
+                    Timestamp = DateTime.Now
+                };
+
+                // Act
+                var result = await controller.CreateMessage(message);
+
+                // Aseert
+                Assert.NotNull(result);
+
+                var okResult = Assert.IsType<OkObjectResult>(result);
+                Assert.Equal(200, okResult.StatusCode);
+
+                var createdMessage = Assert.IsType<Message>(okResult.Value);
+                Assert.Equal("Hello, World!", createdMessage.MessageContent);
+            }
+        }
+
+        [Fact]
+        public async Task CreateMessage_WithNullMessageObject_ReturnsBadRequest_WithMessage()
+        {
+            // Arrange
+            using (var context = await ArrangeTestData())
+            {
+                var controller = new MessageController(context);
+                var blankMessage = null as Message;
+
+                // Act
+                var result = await controller.CreateMessage(blankMessage);
+
+                // Assert
+                Assert.NotNull(result);
+
+                var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+                Assert.Equal(400, badRequestResult.StatusCode);
+
+                var message = Assert.IsType<string>(
+                    badRequestResult.Value?.GetType().GetProperty("message")?.GetValue(badRequestResult.Value));
+                Assert.Equal("Message object is null", message);
+            }
+        }
     }
 }
