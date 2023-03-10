@@ -118,5 +118,33 @@ namespace OpenChat.Auth.Tests
                     okResult.Value?.GetType().GetProperty("token")?.GetValue(okResult.Value));
             }
         }
+
+        [Fact]
+        public async Task Login_ReturnsUnauthorizedObjectResult_WhenUsernameIsNotFound()
+        {
+            using (var context = await ArrangeTestData())
+            {
+                // Arrange
+                var controller = new AuthController(context, _configuration);
+                var request = new UserDto
+                {
+                    Username = "testuser",
+                    Password = "testpassword"
+                };
+
+                // Act
+                var result = await controller.Login(request);
+
+                // Assert
+                Assert.NotNull(result);
+
+                var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+                Assert.Equal(401, unauthorizedResult.StatusCode);
+
+                var message = Assert.IsType<string>(
+                    unauthorizedResult.Value?.GetType().GetProperty("message")?.GetValue(unauthorizedResult.Value));
+                Assert.Equal("User doesn't exist", message);
+            }
+        }
     }
 }
