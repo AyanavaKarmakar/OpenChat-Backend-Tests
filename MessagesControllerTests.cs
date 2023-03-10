@@ -7,14 +7,14 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
 {
     public class MessagesControllerTests
     {
+        private readonly DbContextOptions<ChatDB> options = new DbContextOptionsBuilder<ChatDB>()
+                            .UseInMemoryDatabase(databaseName: "TestDB")
+                            .Options;
+
         [Fact]
         public async Task GetAllMessages_ReturnsOkObjectResult_WithListOfMessages()
         {
             // Arrange
-            var options = new DbContextOptionsBuilder<ChatDB>()
-                        .UseInMemoryDatabase(databaseName: "TestDB")
-                        .Options;
-
             using (var context = new ChatDB(options))
             {
                 var messages = new List<Message>
