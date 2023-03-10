@@ -15,6 +15,10 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
         {
             var context = new ChatDB(options);
 
+            // Clear the database to ensure that there are no duplicate keys
+            await context.Database.EnsureDeletedAsync();
+            await context.Database.EnsureCreatedAsync();
+
             var messages = new List<Message>
             {
                 new Message
@@ -66,6 +70,53 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
                 var messages = Assert.IsAssignableFrom<IEnumerable<Message>>(okResult.Value);
                 Assert.Equal(3, messages.Count());
                 Assert.Equal("How are you?", messages.First().MessageContent);
+            }
+        }
+
+        [Fact]
+        public async Task GetMessageById_WithValidId_ReturnsOkObjectResult_WithMessage()
+        {
+            // Arrange
+            using (var context = await ArrangeTestData())
+            {
+                var controller = new MessageController(context);
+                var messageId = 1;
+
+                // Act
+                var result = await controller.GetMessageById(messageId);
+
+                // Assert
+                Assert.NotNull(result);
+
+                var okResult = Assert.IsType<OkObjectResult>(result);
+                Assert.Equal(200, okResult.StatusCode);
+
+                var message = Assert.IsType<Message>(okResult.Value);
+                Assert.Equal("Hello", message.MessageContent);
+            }
+        }
+
+        [Fact]
+        public async Task GetMessagebyId_WithInvalidId_ReturnsNotFoundObjectResult_WithMessage()
+        {
+            // Arrange
+            using (var context = await ArrangeTestData())
+            {
+                var controller = new MessageController(context);
+                var messageId = 100;
+
+                // Act
+                var result = await controller.GetMessageById(messageId);
+
+                // Assert
+                Assert.NotNull(result);
+
+                var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+                Assert.Equal(404, notFoundResult.StatusCode);
+
+                var message = Assert.IsType<string>(
+                    notFoundResult.Value?.GetType().GetProperty("message")?.GetValue(notFoundResult.Value));
+                Assert.Equal("Message not found", message);
             }
         }
     }
