@@ -89,22 +89,34 @@ namespace OpenChat.Auth.Tests
         }
 
         [Fact]
-        public async Task Register_ReturnsOk_WhenRegistrationIsSuccessful()
+        public async Task Register_ReturnsOkObjectResult_WhenRegistrationIsSuccessful_WithUsernameAndToken()
         {
-            // Arrange
-            var controller = new AuthController(_context, _configuration);
-
-            var request = new UserDto
+            using (var context = await ArrangeTestData())
             {
-                Username = "janedoe",
-                Password = "testpassword"
-            };
+                // Arrange
+                var controller = new AuthController(context, _configuration);
+                var request = new UserDto
+                {
+                    Username = "testuser",
+                    Password = "testpassword"
+                };
 
-            // Act
-            var result = await controller.Register(request);
+                // Act
+                var result = await controller.Register(request);
 
-            // Assert
-            Assert.NotNull(result);
+                // Assert
+                Assert.NotNull(result);
+
+                var okResult = Assert.IsType<OkObjectResult>(result);
+                Assert.Equal(200, okResult.StatusCode);
+
+                var username = Assert.IsType<string>(
+                    okResult.Value?.GetType().GetProperty("username")?.GetValue(okResult.Value));
+                Assert.Equal(request.Username, username);
+
+                Assert.IsType<string>(
+                    okResult.Value?.GetType().GetProperty("token")?.GetValue(okResult.Value));
+            }
         }
     }
 }
