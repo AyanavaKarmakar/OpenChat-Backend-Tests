@@ -53,9 +53,9 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
         [Fact]
         public async Task GetAllMessages_ReturnsOkObjectResult_WithListOfMessages()
         {
-            // Arrange
             using (var context = await ArrangeTestData())
             {
+                // Arrange
                 var controller = new MessageController(context);
 
                 // Act
@@ -76,9 +76,9 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
         [Fact]
         public async Task GetMessageById_WithValidId_ReturnsOkObjectResult_WithMessage()
         {
-            // Arrange
             using (var context = await ArrangeTestData())
             {
+                // Arrange
                 var controller = new MessageController(context);
                 var messageId = 1;
 
@@ -99,9 +99,9 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
         [Fact]
         public async Task GetMessagebyId_WithInvalidId_ReturnsNotFoundObjectResult_WithMessage()
         {
-            // Arrange
             using (var context = await ArrangeTestData())
             {
+                // Arrange
                 var controller = new MessageController(context);
                 var messageId = 100;
 
@@ -123,9 +123,9 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
         [Fact]
         public async Task CreateMessage_WithValidMessage_ReturnsOkObjectResult_WithMessage()
         {
-            // Arrange
             using (var context = await ArrangeTestData())
             {
+                // Arrange
                 var controller = new MessageController(context);
                 var message = new Message
                 {
@@ -152,9 +152,9 @@ namespace OpenChat_Backend.Messages.Controllers.Tests
         [Fact]
         public async Task CreateMessage_WithNullMessageObject_ReturnsBadRequest_WithMessage()
         {
-            // Arrange
             using (var context = await ArrangeTestData())
             {
+                // Arrange
                 var controller = new MessageController(context);
                 var blankMessage = null as Message;
 
